@@ -404,6 +404,12 @@ End-to-end audit is enabled when Agents, Users, Systems, LLMs, Tools, services a
 
 Implementations SHOULD provide operators the ability to reconstruct a complete execution chain of an agent task, including delegated authority, intermediate calls, and resulting actions across service boundaries.
 
+When an authorization decision depends on revocation or other status that can change after token issuance, validating a token's signature and expiry does not by itself evaluate that status. For each such result used, the authorization context identifies its source, when it was obtained, the time to which it applies (its as-of time), and any age limit applied by policy. A decision timestamp, cache retrieval, or forwarding does not reset an earlier result's as-of time.
+
+The audit record of such a decision distinguishes a completed evaluation with a negative result from a required evaluation that could not be completed because an input was unavailable or too old. Both can lead to denial under policy, with distinct recorded reasons. Where no usable result was available, the record identifies the affected input and reason, distinguishing a previously obtained result that is too old under policy from an input for which the decision point had never obtained a result by that decision. For a stale result, the record retains its original as-of time and the applicable age limit. Staleness does not by itself establish that the status changed. A retrieval-attempt time is not an as-of time for a missing result, and an absent timestamp alone does not establish that no result was ever obtained.
+
+These properties describe authorization context and audit semantics; they do not prescribe an evaluator algorithm or an audit-record format.
+
 # Agent Authentication and Authorization Policy {#agent_auhtentication_and_authorization_policy}
 The configuration and runtime parameters for Agent Identifiers {{agent_identifiers}}, Agent Credentials {{agent_credentials}}, Agent Credential Provisioning {{agent_credential_provisioning}}, Agent Authentication {{agent_authentication}}, Agent Authorization {{agent_authorization}} and Agent Monitoring, Observability and Remediation {{agent_monitoring_and_remediation}} collectively constitute the authentication and authorization policy within which the Agent operates.
 
